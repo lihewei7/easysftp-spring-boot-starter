@@ -1,29 +1,12 @@
-
-- [EasySftp](#easysftp)
-  - [简介](#简介)
-  - [Maven 依赖](#maven-依赖)
-  - [配置](#配置)
-    - [SFTP基本配置](#sftp基本配置)
-    - [连接池（可以不配置）](#连接池可以不配置)
-  - [使用](#使用)
-  - [API](#api)
-    - [upload](#upload)
-    - [download](#download)
-    - [exists](#exists)
-    - [list](#list)
-    - [execute](#execute)
-    - [executeWithoutResult](#executewithoutresult)
-  - [未来展望](#未来展望)
-
 # EasySftp
 
 **Github：[https://github.com/lihewei7/easysftp-spring-boot-starter](https://github.com/lihewei7/easysftp-spring-boot-starter)**
 
 **Gitee：[https://gitee.com/lihewei7/easysftp-spring-boot-starter](https://gitee.com/lihewei7/easysftp-spring-boot-starter)**
 
-## 简介
+## EasySftp是什么？
 
-EasySftp是一个 SFTP 的 SpringBoot Starter，使用池技术管理SFTP连接，避免频繁创建新连接，提供和 RedisTemplate 一样优雅的 SftpTemplate。主要提供文件上传、下载、校验、查看等功能。
+EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样优雅的 SftpTemplate。主要包含了：文件上传、下载、校验、查看等功能，为用户提供了一种安全的方式来发送和接收文件和文件夹。使用池技术管理SFTP连接，避免频繁创建新连接造成连接耗时问题。
 
 ## Maven 依赖
 
@@ -45,7 +28,7 @@ EasySftp是一个 SFTP 的 SpringBoot Starter，使用池技术管理SFTP连接�
 
 详细的配置属性说明见参考开发工具的自动提示。
 
-### SFTP配置
+### SFTP基本配置
 
 ```yaml
 sftp:
@@ -57,7 +40,7 @@ sftp:
   # 适配新版本ssh需添加对应的加密算法(参考下面配置即可)
   kex: diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256
 ```
-### 连接池（可以不配置）
+### 连接池配置（不配置则使用默认值）
 
 ```yaml
 sftp:
@@ -103,8 +86,6 @@ public class XXXService {
 
 ### upload
 
-`public void upload(String from, String to) throws SftpException `
-
 上传文件，该方法会递归创建上传的远程文件所在的父目录。
 
 ```java
@@ -119,8 +100,6 @@ sftpTemplate.upload("D:\\a.doc", "a.doc");
 ```
 
 ### download
-
-`public void download(String from, String to) throws SftpException`
 
 下载文件，该方法只会创建下载的本地文件，不会创建本地文件的父目录。
 
@@ -137,8 +116,6 @@ sftpTemplate.download("b.doc", "D:\\b.doc");
 
 ### exists
 
-`public boolean exists(String path) throws SftpException`
-
 校验文件是否存在，存在返回true，不存在返回false
 
 ```java
@@ -151,8 +128,6 @@ boolean result3 = sftpTemplate.exists("c.doc");
 ```
 
 ### list
-
-`public ChannelSftp.LsEntry[] list(String path) throws SftpException`
 
 查看文件/目录
 
