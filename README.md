@@ -14,7 +14,7 @@
     - [execute](#execute)
     - [executeWithoutResult](#executewithoutresult)
   - [未来展望](#未来展望)
-  
+
 # EasySftp
 
 **Github：[https://github.com/lihewei7/easysftp-spring-boot-starter](https://github.com/lihewei7/easysftp-spring-boot-starter)**
@@ -45,7 +45,7 @@ EasySftp是一个 SFTP 的 SpringBoot Starter，使用池技术管理SFTP连接�
 
 详细的配置属性说明见参考开发工具的自动提示。
 
-### SFTP基本配置
+### SFTP配置
 
 ```yaml
 sftp:
