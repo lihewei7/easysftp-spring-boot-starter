@@ -17,10 +17,6 @@ public class SftpProperties {
     private boolean strictHostKeyChecking = false;
     private int connectTimeout = 0;
     /**
-     * SSH kex algorithms.
-     */
-    private String kex;
-    /**
      * Enable jsch log, Cannot be individually turned on or off for one of multiple hosts.
      */
     private boolean enabledLog = false;
@@ -64,14 +60,6 @@ public class SftpProperties {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getKex() {
-        return kex;
-    }
-
-    public void setKex(String kex) {
-        this.kex = kex;
     }
 
     public boolean isEnabledLog() {

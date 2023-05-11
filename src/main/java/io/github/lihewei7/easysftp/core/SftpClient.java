@@ -29,10 +29,12 @@ public class SftpClient {
             session = jsch.getSession(sftpProperties.getUsername(), sftpProperties.getHost(), sftpProperties.getPort());
             session.setPassword(sftpProperties.getPassword());
             Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no"); // 不验证 HostKey
+            config.put("StrictHostKeyChecking", "no");
             config.put("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            if (StringUtils.hasText(sftpProperties.getKex()))
-                config.put("kex", sftpProperties.getKex());
+            //The encryption algorithm must be added for the new ssh version
+            config.put("kex", "diffie-hellman-group1-sha1,"
+                    + "diffie-hellman-group-exchange-sha1,"
+                    + "diffie-hellman-group-exchange-sha256");
             session.setConfig(config);
             session.connect(sftpProperties.getConnectTimeout());
             channelSftp = (ChannelSftp) session.openChannel("sftp");
