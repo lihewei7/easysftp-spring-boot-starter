@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.lihewei7</groupId>
     <artifactId>easysftp-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <name>easysftp-spring-boot-starter</name>
     <description>Starter for sftp</description>
     <url>https://github.com/lihewei7/easysftp-spring-boot-starter</url>

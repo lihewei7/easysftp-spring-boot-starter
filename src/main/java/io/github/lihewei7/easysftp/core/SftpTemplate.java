@@ -20,16 +20,18 @@ public class SftpTemplate {
      */
     public <T> T execute(SftpCallback<T> action) throws SftpException {
         Assert.notNull(action, "Callback object must not be null");
+        String hostName = sftpPool.isUniqueHost() ? null : HostsManage.getHostName();
         SftpClient sftpClient = null;
         try {
-            sftpClient = sftpPool.borrowObject();
+            sftpClient = sftpPool.borrowObject(hostName);
             return action.doInSftp(sftpClient.getChannelSftp());
         } finally {
+            HostsManage.clear();
             if (sftpClient != null) {
                 if (sftpClient.reset()) {
-                    sftpPool.returnObject(sftpClient);
+                    sftpPool.returnObject(hostName, sftpClient);
                 } else {
-                    sftpPool.invalidateObject(sftpClient);
+                    sftpPool.invalidateObject(hostName, sftpClient);
                 }
             }
         }
@@ -41,19 +43,10 @@ public class SftpTemplate {
      */
     public void executeWithoutResult(SftpCallbackWithoutResult action) throws SftpException {
         Assert.notNull(action, "Callback object must not be null");
-        SftpClient sftpClient = null;
-        try {
-            sftpClient = sftpPool.borrowObject();
-            action.doInSftp(sftpClient.getChannelSftp());
-        } finally {
-            if (sftpClient != null) {
-                if (sftpClient.reset()) {
-                    sftpPool.returnObject(sftpClient);
-                } else {
-                    sftpPool.invalidateObject(sftpClient);
-                }
-            }
-        }
+        this.execute(ChannelSftp -> {
+            action.doInSftp(ChannelSftp);
+            return null;
+        });
     }
 
     public void download(String from, String to) throws SftpException {

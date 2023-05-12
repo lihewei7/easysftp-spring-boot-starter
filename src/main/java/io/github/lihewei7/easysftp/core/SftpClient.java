@@ -5,7 +5,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import io.github.lihewei7.easysftp.config.SftpProperties;
-import org.springframework.util.StringUtils;
 
 import java.util.Properties;
 

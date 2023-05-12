@@ -2,11 +2,9 @@
 
 >**Github：[https://github.com/lihewei7/easysftp-spring-boot-starter](https://github.com/lihewei7/easysftp-spring-boot-starter)**
 
->**Gitee：[https://gitee.com/lihewei7/easysftp-spring-boot-starter](https://gitee.com/lihewei7/easysftp-spring-boot-starter)**
-
 ## EasySftp是什么？
 
-EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样优雅的 SftpTemplate。主要包含了：文件上传、下载、校验、查看等功能，为用户提供了一种安全的方式来发送和接收文件和文件夹。使用池技术管理SFTP连接，避免频繁创建新连接造成连接耗时问题。
+​	EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样优雅的 SftpTemplate。主要包含了：文件上传、下载、校验、查看等功能，为用户提供了一种安全的方式来发送和接收文件和文件夹。使用池技术管理SFTP连接，避免频繁创建新连接造成连接耗时问题。
 
 ## Maven 依赖
 
@@ -16,7 +14,7 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 <dependency>
     <groupId>io.github.lihewei7</groupId>
     <artifactId>easysftp-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 <dependency>
     <groupId>org.apache.commons</groupId>
@@ -26,9 +24,9 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 
 ## 配置
 
-详细的配置属性说明见参考开发工具的自动提示。
+### 单主机配置
 
-### SFTP基本配置
+- sftp基本配置
 
 ```yaml
 sftp:
@@ -37,10 +35,8 @@ sftp:
   port: 22
   username: root
   password: 1234
-  # 适配新版本ssh需添加对应的加密算法(参考下面配置即可)
-  kex: diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256
 ```
-### 连接池配置（不配置则使用默认值）
+- 连接池配置（可不配置使用默认值）
 
 ```yaml
 sftp:
@@ -56,9 +52,48 @@ sftp:
     min-evictable-idle-time-millis: 1800000
 ```
 
+### 多主机配置
+
+在多 Host 使用  SftpTemplate 需要为 Easysftp 指定将要使用的主机，详细操作见下方API
+
+- hosts下可配置多台主机。rd-1为主机名（sftp.hosts 下 map 中的 key 代表 hostName ，可自定义主机名）
+
+```yaml
+sftp:
+  enabled-log: false
+  hosts:
+    rd-1:
+      host: 127.0.0.1
+      port: 22
+      username: lihw
+      password: 1234
+    rd-2:
+      host: 127.0.0.2
+      port: 22
+      username: lihw
+      password: 1234
+```
+
+-  多 Host 连接池配置（可不配置使用默认值）
+
+```yaml
+sftp:
+  pool:
+    min-idle-per-key: 1
+    max-idle-per-key: 8
+    max-active-per-key: 8
+    max-active: 8
+    max-wait: -1
+    test-on-borrow: true
+    test-on-return: false
+    test-while-idle: true
+    time-between-eviction-runs: 600000
+    min-evictable-idle-time-millis: 1800000
+```
+
 ## 使用
 
-EasySftp 提供 SftpTemplate 类，它与 `spring-boot-starter-data-redis`  提供的 RedisTemplate 使用方法相同，任意方式注入即可使用：
+​	EasySftp 提供 SftpTemplate 类，它与 `spring-boot-starter-data-redis`  提供的 RedisTemplate 使用方法相同，任意方式注入即可使用：
 
 ```java
 @Component
@@ -79,10 +114,7 @@ public class XXXService {
 
 ## API
 
-- 所有方法都可能抛出 `SftpException`，这通常代表连接出问题了，也可能是你上传或下载的文件不存在。
-- sftp 操作可能会改变工作目录，因此在连接返回给池前，框架会重置工作目录为原始目录。注意这只会重置远端工作路径，不会重置本地工作路径。
-
-下面的介绍全部使用 `配置` 章节中的配置进行说明，因此初始工作目录是 `/root`。
+​	所有方法都可能抛出 `SftpException`，这通常代表连接出问题了，也可能是你上传或下载的文件不存在。sftp 操作可能会改变工作目录，因此在连接返回给池前，框架会重置工作目录为原始目录。注意这只会重置远端工作路径，不会重置本地工作路径。下面的介绍全部使用 `配置` 章节中的配置进行说明，因此初始工作目录是 `/root`。
 
 ### upload
 
@@ -163,9 +195,51 @@ String dir2 = sftpTemplate.execute(ChannelSftp -> pwd());
 sftpTemplate.executeWithoutResult(channelSftp -> System.out.println(channelSftp.getHome()));
 ```
 
+### 多Host
 
+- `HostsManage.changeHost(string)` ：通过 hostName 指定下次使用的连接。注意它只能指定下一次的连接！！！
 
-## 未来展望
+```java
+HostsManage.changeHost("rd-1");
+// 成功打印 rd-1 对应连接的原始目录
+sftpTemplate.execute(ChannelSftp::pwd);
+// 第二次执行失败，抛出空指针，需要再次指定对应连接才能继续使用
+sftpTemplate.execute(ChannelSftp::pwd);
+```
 
-- 兼容ftp协议
+- `HostsManage.changeHost(string, boolean)`：连续使用相同 host 进行操作，避免执行一次 SftpTemplate 就要设置一次 hostName。注意要配合 `HostHolder.clearHost()` 使用！！！
+
+```java
+HostsManage.changeHost("rd-1", false);
+try {
+  sftpTemplate.upload("D:\\a.docx", "/home/easysftp/a.docx");
+  sftpTemplate.upload("D:\\b.pdf", "easysftp/b.pdf");
+  sftpTemplate.upload("D:\\c.doc", "c.doc");
+} finally {
+  HostsManage.clearHost();
+}
+```
+
+- `HostsManage.hostNames()` 与 ：获取所有的 host 连接的 name
+
+```java
+//有时需要批量执行配置的 n 个 host 连接，此时可以通过该方法获取所有或过滤后的 hostName 集合。
+for (String hostName : HostsManage.hostNames()) {
+   HostsManage.changeHost(hostName);
+   sftpTemplate.upload("D:\\a.docx", "/home/easysftp/a.docx");
+}
+```
+
+- `HostsManage.hostNames(Predicate<String>)`：获取过滤后的 host 连接的 name
+
+```java
+// 获取所有以“rd-”开头的 hostName
+for (String hostName : HostsManage.hostNames(s -> s.startsWith("rd-"))) {
+  HostsManage.changeHost(hostName);
+  sftpTemplate.upload("D:\\a.docx", "/home/easysftp/a.docx");
+}
+```
+
+## 未来
+
 - 实现SFTP监控传输进度
