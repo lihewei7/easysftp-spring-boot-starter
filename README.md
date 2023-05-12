@@ -4,7 +4,7 @@
 
 ## EasySftp是什么？
 
-​	EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样优雅的 SftpTemplate。主要包含了：文件上传、下载、校验、查看等功能，为用户提供了一种安全的方式来发送和接收文件和文件夹。使用池技术管理SFTP连接，避免频繁创建新连接造成连接耗时问题。
+EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样优雅的 SftpTemplate。主要包含了：文件上传、下载、校验、查看等功能，为用户提供了一种安全的方式来发送和接收文件和文件夹。使用池技术管理SFTP连接，避免频繁创建新连接造成连接耗时问题。
 
 ## Maven 依赖
 
@@ -93,7 +93,7 @@ sftp:
 
 ## 使用
 
-​	EasySftp 提供 SftpTemplate 类，它与 `spring-boot-starter-data-redis`  提供的 RedisTemplate 使用方法相同，任意方式注入即可使用：
+EasySftp 提供 SftpTemplate 类，它与 `spring-boot-starter-data-redis`  提供的 RedisTemplate 使用方法相同，任意方式注入即可使用：
 
 ```java
 @Component
