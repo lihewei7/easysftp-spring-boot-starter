@@ -1,6 +1,10 @@
 # EasySftp
 
->**Github：[https://github.com/lihewei7/easysftp-spring-boot-starter](https://github.com/lihewei7/easysftp-spring-boot-starter)**
+ ![](https://gitee.com/lihewei7/img/raw/master/images/sftp3.png#pic_right)
+
+> **Github：[https://github.com/lihewei7/easysftp-spring-boot-starter](https://github.com/lihewei7/easysftp-spring-boot-starter)**
+
+> **Gitee：[https://gitee.com/lihewei7/easysftp-spring-boot-starter](https://gitee.com/lihewei7/easysftp-spring-boot-starter)**
 
 ## EasySftp是什么？
 
@@ -8,7 +12,8 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 
 ## Maven 依赖
 
-依赖 Apache commons-pool2：
+- EasySftp已上传至Maven中央仓库，在工程中导入依赖即可使用
+- 依赖 Apache commons-pool2
 
 ```xml
 <dependency>
@@ -243,3 +248,4 @@ for (String hostName : HostsManage.hostNames(s -> s.startsWith("rd-"))) {
 ## 未来
 
 - 实现SFTP监控传输进度
+
