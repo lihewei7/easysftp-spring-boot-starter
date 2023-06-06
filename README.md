@@ -20,7 +20,7 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 <dependency>
     <groupId>io.github.lihewei7</groupId>
     <artifactId>easysftp-spring-boot-starter</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 <dependency>
     <groupId>org.apache.commons</groupId>
@@ -28,11 +28,11 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 </dependency>
 ```
 
-## 配置
+## 配置Sftp服务器
 
 ### 单主机配置
 
-- sftp基本配置
+- sftp基本配置（密码登录）
 
 ```yaml
 sftp:
@@ -42,6 +42,21 @@ sftp:
   username: root
   password: 1234
 ```
+- sftp基本配置（密钥登录）
+
+
+```yaml
+sftp:
+  enabled-log: false
+  host: 10.1.61.118
+  port: 19222
+  username: lihw
+  check-to-host-key: true
+  key-path: /home/lihw/.ssh/id_rsa
+  password: 生成密钥时的密码
+  connect-timeout: 1500
+```
+
 - 连接池配置（可不配置使用默认值）
 
 ```yaml
@@ -60,9 +75,9 @@ sftp:
 
 ### 多主机配置
 
-在多 Host 使用  SftpTemplate 需要为 Easysftp 指定将要使用的主机，详细操作见下方API
+在多 Host 使用  SftpTemplate 需要为 Easysftp 指定将要使用的主机，详细操作见下方API。hosts 下可配置多台主机。rd-1为主机名（sftp.hosts 下 map 中的 key 代表 hostName ，可自定义主机名）
 
-- hosts下可配置多台主机。rd-1为主机名（sftp.hosts 下 map 中的 key 代表 hostName ，可自定义主机名）
+- 多 host ，密码登录
 
 ```yaml
 sftp:
@@ -78,6 +93,28 @@ sftp:
       port: 22
       username: lihw
       password: 1234
+```
+
+-  多 host ，密码 + 密钥登录方式
+
+```yaml
+sftp:
+  enabled-log: false
+  hosts:
+    rd-118:
+      host: 10.1.61.118
+      port: 19222
+      username: lihw
+      password: 1234
+      connect-timeout: 1500
+    rd-118:
+      host: 10.1.61.119
+      port: 19222
+      username: lihw
+      check-to-host-key: true
+      key-path: /home/lihw/.ssh/id_rsa
+      password: 生成密钥时设置的密码
+      connect-timeout: 1500
 ```
 
 -  多 Host 连接池配置（可不配置使用默认值）
@@ -96,6 +133,33 @@ sftp:
     time-between-eviction-runs: 600000
     min-evictable-idle-time-millis: 1800000
 ```
+
+## 密钥登录注意事项
+
+EasySftp 使用`Jsch`作为 SFTP 的实现，而`Jsch`不支持密钥登录，因此你需要一些小改动：
+
+- 更改`jsch`的实现：Jcraft 自 2018 年推送的 0.1.55 版本后就停止更新了，所以更换为其他人 fork 的 Jsch 库
+
+  ```xml
+  <dependency>
+  	<groupId>io.github.lihewei7</groupId>
+  	<artifactId>easysftp-spring-boot-starter</artifactId>
+  	<version>1.2.0</version>
+  	<exclusions>
+  		<exclusion>
+  			<groupId>com.jcraft</groupId>
+  			<artifactId>jsch</artifactId>
+  		</exclusion>
+  	</exclusions>
+  </dependency>
+  <dependency>
+  	<groupId>com.github.mwiede</groupId>
+  	<artifactId>jsch</artifactId>
+  	<version>0.2.9</version>
+  </dependency>
+  ```
+
+- 密钥生成规则：[JSch - 配置SFTP服务器SSH密钥登录 - lihewei - 博客园 (cnblogs.com)](https://www.cnblogs.com/lihw/p/17336989.html)
 
 ## 使用
 
@@ -245,8 +309,3 @@ for (String hostName : HostsManage.hostNames(s -> s.startsWith("rd-"))) {
   sftpTemplate.upload("D:\\a.docx", "/home/easysftp/a.docx");
 }
 ```
-
-## 未来
-
-- 实现SFTP监控传输进度
-

@@ -1,12 +1,7 @@
 package io.github.lihewei7.easysftp.core;
 
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import io.github.lihewei7.easysftp.config.SftpProperties;
-
-import java.util.Properties;
 
 /**
  * @explain: SFTP Client.
@@ -26,15 +21,21 @@ public class SftpClient {
         try {
             JSch jsch = new JSch();
             session = jsch.getSession(sftpProperties.getUsername(), sftpProperties.getHost(), sftpProperties.getPort());
-            session.setPassword(sftpProperties.getPassword());
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            config.put("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            //The encryption algorithm must be added for the new ssh version
-            config.put("kex", "diffie-hellman-group1-sha1,"
+            if (sftpProperties.isCheckToHostKey()) {
+                session.setConfig("PreferredAuthentications", "publickey");
+                session.setConfig("userauth.gssapi-with-mic", "no");
+                session.setConfig("StrictHostKeyChecking", "ask");
+                session.setUserInfo(new SftpAuthKeyUserInfo(sftpProperties.getPassword()));
+                jsch.addIdentity(sftpProperties.getKeyPath());
+            } else {
+                session.setConfig("PreferredAuthentications", "password");
+                session.setConfig("StrictHostKeyChecking", "no");
+                session.setPassword(sftpProperties.getPassword());
+            }
+            session.setConfig("UseDNS", "no");
+            session.setConfig("kex", "diffie-hellman-group1-sha1,"
                     + "diffie-hellman-group-exchange-sha1,"
                     + "diffie-hellman-group-exchange-sha256");
-            session.setConfig(config);
             session.connect(sftpProperties.getConnectTimeout());
             channelSftp = (ChannelSftp) session.openChannel("sftp");
             channelSftp.connect();
@@ -77,6 +78,46 @@ public class SftpClient {
             return true;
         } catch (SftpException e) {
             return false;
+        }
+    }
+
+    private static class SftpAuthKeyUserInfo  implements UserInfo {
+        /**
+         * ssh private key passphrase
+         */
+        private final String passphrase;
+
+        public SftpAuthKeyUserInfo  (String passphrase) {
+            this.passphrase = passphrase;
+        }
+
+        @Override
+        public String getPassphrase() {
+            return passphrase;
+        }
+
+        @Override
+        public String getPassword() {
+            return null;
+        }
+
+        @Override
+        public boolean promptPassphrase(String s) {
+            return true;
+        }
+
+        @Override
+        public boolean promptPassword(String s) {
+            return false;
+        }
+
+        @Override
+        public boolean promptYesNo(String s) {
+            return true;
+        }
+
+        @Override
+        public void showMessage(String message) {
         }
     }
 }

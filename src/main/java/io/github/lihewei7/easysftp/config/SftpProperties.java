@@ -22,7 +22,18 @@ public class SftpProperties {
      * Enable jsch log, Cannot be individually turned on or off for one of multiple hosts.
      */
     private boolean enabledLog = false;
-
+    /**
+     * Whether to use a key to log in
+     */
+    private Boolean isCheckToHostKey = false;
+    /**
+     * SSH kex algorithms.
+     */
+    private String kex;
+    /**
+     * host key.
+     */
+    private String keyPath;
     /**
      * Configuring multiple hosts.
      */
@@ -82,5 +93,29 @@ public class SftpProperties {
 
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
+    }
+
+    public Boolean isCheckToHostKey() {
+        return isCheckToHostKey;
+    }
+
+    public void setCheckToHostKey(Boolean checkToHostKey) {
+        isCheckToHostKey = checkToHostKey;
+    }
+
+    public String getKex() {
+        return kex;
+    }
+
+    public void setKex(String kex) {
+        this.kex = kex;
+    }
+
+    public String getKeyPath() {
+        return keyPath;
+    }
+
+    public void setKeyPath(String keyPath) {
+        this.keyPath = keyPath;
     }
 }
