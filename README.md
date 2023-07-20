@@ -28,7 +28,13 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 </dependency>
 ```
 
-## 配置Sftp服务器
+| v1.0.0 | 版本初始化                                    |
+| ------ | ---------------------------------------- |
+| 毕业版本   | 描述                                       |
+| v1.1.0 | Support multiple SFTP simultaneous connections |
+| v1.2.0 | Support Login using a key                |
+
+## 配置
 
 ### 单主机配置
 
@@ -134,7 +140,7 @@ sftp:
     min-evictable-idle-time-millis: 1800000
 ```
 
-## 密钥登录注意事项
+### 密钥登录注意事项
 
 EasySftp 使用`Jsch`作为 SFTP 的实现，而`Jsch`不支持密钥登录，因此你需要一些小改动：
 
