@@ -28,9 +28,9 @@ EasySftp 是一个 SFTP 的 SpringBoot Starter，提供和 RedisTemplate 一样�
 </dependency>
 ```
 
-| v1.0.0 | 版本初始化                                    |
-| ------ | ---------------------------------------- |
 | 毕业版本   | 描述                                       |
+| ------ | ---------------------------------------- |
+| v1.0.0 | Version initialization                   |
 | v1.1.0 | Support multiple SFTP simultaneous connections |
 | v1.2.0 | Support Login using a key                |
 
